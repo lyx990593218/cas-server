@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.springframework.org/schema/webflow"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+
+    <action-state id="initializeLoginForm">
+        <evaluate expression="initializeLoginAction" />
+        <transition on="success" to="viewLoginForm"/>
+<!--        <transition on="success" to="viewLoginForm2"/>-->
+    </action-state>
+
+    <view-state id="viewLoginForm" view="casLoginView" model="credential">
+        <binder>
+            <binding property="username" required="true"/>
+            <binding property="password" required="true"/>
+            <binding property="validCode" required="false"/>
+            <binding property="loginMethod" required="false"/>
+            <binding property="deviceId" required="false"/>
+            <binding property="recaptcha" required="false"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="realSubmit" history="invalidate"/>
+    </view-state>
+
+    <view-state id="viewLoginForm2" view="casLoginView" model="credential2">
+        <binder>
+            <binding property="phone" required="true"/>
+            <binding property="validCode" required="true"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="realSubmit" history="invalidate"/>
+    </view-state>
+
+    <action-state id="realSubmit">
+        <evaluate expression="authenticationViaFormAction"/>
+        <transition on="warn" to="warn"/>
+        <transition on="success" to="createTicketGrantingTicket"/>
+        <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="initializeLoginForm"/>
+    </action-state>
+
+</flow>
